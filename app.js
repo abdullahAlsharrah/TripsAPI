@@ -1,18 +1,29 @@
+// imports
+//
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-const db = require("./db/models");
 const app = express();
-const { localStrategy } = require("./middleware/passport");
+//database
+const db = require("./db/models");
+// Routes
 const userRoute = require("./routes/users");
-
+const tripRoute = require("./routes/trips");
 // middlewares
 const passport = require("passport");
+const { localStrategy } = require("./middleware/passport");
+const path = require("path");
 
+// app
 app.use(bodyParser.json());
 app.use(cors());
 app.use(passport.initialize());
 passport.use(localStrategy);
+//Routes
+app.use("/trips", tripRoute);
+// middleWare
+app.use("/media", express.static(path.join(__dirname, "media")));
+//User Route
 app.use(userRoute);
 
 app.use((req, res, next) => {
@@ -29,7 +40,7 @@ app.use((err, req, res, next) => {
 
 const run = async () => {
   try {
-    await db.sequelize.sync();
+    await db.sequelize.sync({ alter: true });
     app.listen(8002, () => {
       console.log("Hello the app is succesfully working");
     });
