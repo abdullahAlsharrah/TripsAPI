@@ -1,4 +1,4 @@
-const { Trip } = require("../db/models");
+const { Trip, User } = require("../db/models");
 
 exports.fetchTrip = async (tripId, next) => {
   try {
@@ -11,7 +11,13 @@ exports.fetchTrip = async (tripId, next) => {
 
 exports.tripList = async (req, res, next) => {
   try {
-    const trips = await Trip.findAll();
+    const trips = await Trip.findAll({
+      include: {
+        model: User,
+        as: "user",
+        attributes: ["username"],
+      },
+    });
     res.json(trips);
   } catch (error) {
     next(error);
@@ -20,12 +26,12 @@ exports.tripList = async (req, res, next) => {
 
 exports.tripCreate = async (req, res, next) => {
   try {
-    console.log(req.file);
     if (req.file) {
       req.body.image = `${req.protocol}://${req.get("host")}/media/${
         req.file.filename
       }`;
     }
+    req.body.userId = req.user.id;
     const newTrip = await Trip.create(req.body);
     res.status(201).json(newTrip);
   } catch (error) {
@@ -35,8 +41,15 @@ exports.tripCreate = async (req, res, next) => {
 
 exports.tripDelete = async (req, res, next) => {
   try {
-    await req.trip.destroy();
-    res.status(204).end();
+    if (req.user.id === req.trip.userId) {
+      req.body.userId = req.user.id;
+      await req.trip.destroy();
+      res.status(204).end();
+    } else {
+      const err = new Error("Unauthorized");
+      err.status = 401;
+      next(err);
+    }
   } catch (error) {
     next(error);
   }
@@ -44,13 +57,20 @@ exports.tripDelete = async (req, res, next) => {
 
 exports.tripUpdate = async (req, res, next) => {
   try {
-    if (req.file) {
-      req.body.image = `${req.protocol}://${req.get("host")}/media/${
-        req.file.filename
-      }`;
+    if (req.user.id === req.trip.userId) {
+      if (req.file) {
+        req.body.image = `${req.protocol}://${req.get("host")}/media/${
+          req.file.filename
+        }`;
+      }
+      req.body.userId = req.user.id;
+      await req.trip.update(req.body);
+      res.status(204).end();
+    } else {
+      const err = new Error("Unauthorized");
+      err.status = 401;
+      next(err);
     }
-    await req.trip.update(req.body);
-    res.status(204).end();
   } catch (error) {
     next(error);
   }

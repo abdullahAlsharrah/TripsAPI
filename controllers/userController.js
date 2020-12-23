@@ -5,6 +5,15 @@ const { JWT_SECRET, JWT_EXPIRATION_MS } = require("../config/keys");
 // Database
 const { User } = require("../db/models");
 
+exports.fetchUser = async (userId, next) => {
+  try {
+    const user = await User.findByPk(userId);
+    return user;
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.signup = async (req, res, next) => {
   const { password } = req.body;
   const saltRounds = 10;
