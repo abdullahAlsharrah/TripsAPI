@@ -11,7 +11,7 @@ const userRoute = require("./routes/users");
 const tripRoute = require("./routes/trips");
 // middlewares
 const passport = require("passport");
-const { localStrategy } = require("./middleware/passport");
+const { localStrategy, jwtStrategy } = require("./middleware/passport");
 const path = require("path");
 
 // app
@@ -19,6 +19,7 @@ app.use(bodyParser.json());
 app.use(cors());
 app.use(passport.initialize());
 passport.use(localStrategy);
+passport.use(jwtStrategy);
 //Routes
 app.use("/trips", tripRoute);
 // middleWare
@@ -40,7 +41,7 @@ app.use((err, req, res, next) => {
 
 const run = async () => {
   try {
-    await db.sequelize.sync({ alter: true });
+    await db.sequelize.sync({ force: true });
     app.listen(8002, () => {
       console.log("Hello the app is succesfully working");
     });

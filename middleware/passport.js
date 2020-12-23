@@ -8,7 +8,7 @@ const { JWT_SECRET } = require("../config/keys");
 exports.localStrategy = new LocalStrategy(async (username, password, done) => {
   try {
     const user = await User.findOne({
-      where: { username }, // equivalent to { username : username }
+      where: { username },
     });
     const passwordsMatch = user
       ? await bcrypt.compare(password, user.password)
@@ -33,7 +33,7 @@ exports.jwtStrategy = new JWTStrategy(
       return done(null, false);
     }
     try {
-      const user = await User.findByPk(njwtPayload.id);
+      const user = await User.findByPk(jwtPayload.id);
       done(null, user);
     } catch (error) {
       done(error);
