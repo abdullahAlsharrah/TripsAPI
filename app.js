@@ -9,6 +9,7 @@ const db = require("./db/models");
 // Routes
 const userRoute = require("./routes/users");
 const tripRoute = require("./routes/trips");
+const profileRoute = require("./routes/profiles");
 // middlewares
 const passport = require("passport");
 const { localStrategy, jwtStrategy } = require("./middleware/passport");
@@ -22,6 +23,7 @@ passport.use(localStrategy);
 passport.use(jwtStrategy);
 //Routes
 app.use("/trips", tripRoute);
+app.use("/profile", profileRoute);
 // middleWare
 app.use("/media", express.static(path.join(__dirname, "media")));
 //User Route

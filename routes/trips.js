@@ -8,6 +8,7 @@ const {
   tripCreate,
   tripList,
   tripUpdate,
+  tripFavoriteUpdate,
 } = require("../controllers/tripController");
 //multer middleware for uploading an image as file
 const upload = require("../middleware/multer");
@@ -46,4 +47,5 @@ router.put(
   passport.authenticate("jwt", { session: false }),
   tripUpdate
 );
+
 module.exports = router;

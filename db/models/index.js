@@ -51,4 +51,9 @@ db.User.hasMany(db.Trip, {
 //One Trip belomgs to a user
 db.Trip.belongsTo(db.User, { as: "user" });
 
+//One user has one profile
+db.User.hasOne(db.Profile, { as: "profile", foreignKey: "userId" });
+// one profile belongs to one user
+db.Profile.belongsTo(db.User, { as: "user" });
+
 module.exports = db;
