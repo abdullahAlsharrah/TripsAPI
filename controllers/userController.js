@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 const { JWT_SECRET, JWT_EXPIRATION_MS } = require("../config/keys");
 
 // Database
-const { User } = require("../db/models");
+const { User, Profile } = require("../db/models");
 
 exports.fetchUser = async (userId, next) => {
   try {
@@ -21,6 +21,7 @@ exports.signup = async (req, res, next) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     req.body.password = hashedPassword;
     const newUser = await User.create(req.body);
+    const newProfile = await Profile.create({ userId: newUser.id });
     // to signin after sign up
     const payload = {
       id: newUser.id,
@@ -28,6 +29,8 @@ exports.signup = async (req, res, next) => {
       email: newUser.email,
       firstName: newUser.firstName,
       lastName: newUser.lastName,
+      image: newProfile.image,
+      bio: newProfile.bio,
       expires: Date.now() + JWT_EXPIRATION_MS,
     };
     const token = jwt.sign(JSON.stringify(payload), JWT_SECRET);

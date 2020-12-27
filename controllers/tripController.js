@@ -35,6 +35,7 @@ exports.tripCreate = async (req, res, next) => {
     const newTrip = await Trip.create(req.body);
     res.status(201).json(newTrip);
   } catch (error) {
+    console.log("hiii");
     next(error);
   }
 };

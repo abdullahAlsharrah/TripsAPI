@@ -15,13 +15,11 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    slug: {
-      type: DataTypes.STRING,
-      unique: true,
+    favorite: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
     },
   });
-  SequelizeSlugify.slugifyModel(Trip, {
-    source: ["title"],
-  });
+
   return Trip;
 };
